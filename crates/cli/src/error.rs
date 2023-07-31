@@ -298,13 +298,7 @@ mod test {
       inner: &error,
     };
     let display = format!("{error_fmt}");
-    assert_eq!(display.lines().count(), 6);
-    assert!(display.contains("Cannot read configuration."));
-    assert!(
-      display.contains("Caused by"),
-      "Should display the error chain"
-    );
-    assert!(display.contains("test error"));
+    assert_eq!(display, "\u{1b}[31mError:\u{1b}[0m \u{1b}[1mCannot read configuration.\u{1b}[0m\n\u{1b}[34mHelp:\u{1b}[0m Please add an sgconfig.yml configuration file in the project root to run the scan command.\n\u{1b}[1;2mSee also:\u{1b}[0m \u{1b}]8;;https://ast-grep.github.io/guide/rule-config.html\u{1b}\\\u{1b}[3;36mhttps://ast-grep.github.io/guide/rule-config.html\u{1b}[0m\u{1b}]8;;\u{1b}\\\n\n\u{1b}[31m×\u{1b}[0m Caused by\n\u{1b}[31m╰▻\u{1b}[0m test error\n");
   }
 
   #[test]
@@ -315,11 +309,6 @@ mod test {
       inner: &error,
     };
     let display = format!("{error_fmt}");
-    assert_eq!(display.lines().count(), 3);
-    assert!(display.contains("Cannot read configuration."));
-    assert!(
-      !display.contains("Caused by"),
-      "Should not contain error chain"
-    );
+    assert_eq!(display, "\u{1b}[31mError:\u{1b}[0m \u{1b}[1mCannot read configuration.\u{1b}[0m\n\u{1b}[34mHelp:\u{1b}[0m Please add an sgconfig.yml configuration file in the project root to run the scan command.\n\u{1b}[1;2mSee also:\u{1b}[0m \u{1b}]8;;https://ast-grep.github.io/guide/rule-config.html\u{1b}\\\u{1b}[3;36mhttps://ast-grep.github.io/guide/rule-config.html\u{1b}[0m\u{1b}]8;;\u{1b}\\\n");
   }
 }
