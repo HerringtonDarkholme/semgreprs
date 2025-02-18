@@ -5,6 +5,7 @@ use crate::utils::Granularity;
 
 use anyhow::{Context, Result};
 use clap::{Args, ValueEnum};
+use encoding_rs::Encoding;
 use ignore::{
   overrides::{Override, OverrideBuilder},
   WalkBuilder, WalkParallel,
@@ -59,6 +60,15 @@ pub struct InputArgs {
   /// heuristics.
   #[clap(short = 'j', long, default_value = "0", value_name = "NUM")]
   pub threads: usize,
+
+  /// Treat files as encoded with this encoding
+  #[clap(long, default_value = "UTF-8", value_parser = parse_encoding)]
+  pub encoding: &'static Encoding,
+}
+
+fn parse_encoding(encoding_label: &str) -> Result<&'static Encoding, String> {
+  Encoding::for_label(encoding_label.as_bytes())
+    .ok_or_else(|| format!("Unsupported encoding: {}", encoding_label))
 }
 
 impl InputArgs {

@@ -39,6 +39,7 @@ atty = "0.2.14"
 clap = { version = "4.5.4", features = ["derive"] }
 codespan-reporting = "0.11.1"
 crossterm = "0.28.0"
+encoding_rs = "0.8.34"
 ignore.workspace = true
 regex.workspace = true
 inquire = "0.7.5"

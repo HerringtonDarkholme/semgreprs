@@ -216,15 +216,16 @@ impl PathWorker for RunWithInferredLang {
     let lang = SgLang::from_path(path)?;
     self.trace.print_file(path, lang).ok()?;
     let matcher = self.arg.build_pattern(lang).ok()?;
+    let encoding = self.arg.input.encoding;
     // match sub region
     if let Some(sub_langs) = lang.injectable_sg_langs() {
       let matchers = sub_langs.filter_map(|l| {
         let pattern = self.arg.build_pattern(l).ok()?;
         Some((l, pattern))
       });
-      filter_file_pattern(path, lang, Some(matcher), matchers)
+      filter_file_pattern(path, lang, Some(matcher), matchers, encoding)
     } else {
-      filter_file_pattern(path, lang, Some(matcher), std::iter::empty())
+      filter_file_pattern(path, lang, Some(matcher), std::iter::empty(), encoding)
     }
   }
 }
@@ -290,10 +291,17 @@ impl PathWorker for RunWithSpecificLang {
     let lang = arg.lang.expect("must present");
     let path_lang = SgLang::from_path(path)?;
     self.stats.print_file(path, path_lang).ok()?;
+    let encoding = arg.input.encoding;
     let ret = if path_lang == lang {
-      filter_file_pattern(path, lang, Some(pattern), std::iter::empty())?
+      filter_file_pattern(path, lang, Some(pattern), std::iter::empty(), encoding)?
     } else {
-      filter_file_pattern(path, path_lang, None, std::iter::once((lang, pattern)))?
+      filter_file_pattern(
+        path,
+        path_lang,
+        None,
+        std::iter::once((lang, pattern)),
+        encoding,
+      )?
     };
     Some(ret.into_iter().map(|n| n.0).collect())
   }

@@ -210,7 +210,8 @@ impl PathWorker for ScanWithConfig {
     self.arg.input.walk_langs(langs.into_iter())
   }
   fn produce_item(&self, path: &Path) -> Option<Vec<Self::Item>> {
-    filter_file_interactive(path, &self.configs, &self.trace)
+    let encoding = self.arg.input.encoding;
+    filter_file_interactive(path, &self.configs, &self.trace, encoding)
   }
 }
 

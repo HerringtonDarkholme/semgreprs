@@ -7,6 +7,7 @@ mod worker;
 
 pub use args::{ContextArgs, InputArgs, OutputArgs, OverwriteArgs};
 pub use debug_query::DebugFormat;
+use encoding_rs::Encoding;
 pub use error_context::{exit_with_error, ErrorContext};
 pub use inspect::{FileTrace, Granularity, RuleTrace, RunTrace, ScanTrace};
 pub use rule_overwrite::RuleOverwrite;
@@ -28,7 +29,7 @@ use ast_grep_core::Pattern;
 use ast_grep_core::{Matcher, StrDoc};
 use ast_grep_language::Language;
 
-use std::fs::read_to_string;
+use std::fs::read;
 use std::io::stdout;
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -90,11 +91,17 @@ pub fn prompt(prompt_text: &str, letters: &str, default: Option<char>) -> Result
   }
 }
 
-fn read_file(path: &Path) -> Option<String> {
-  let file_content = read_to_string(path)
+fn read_file(path: &Path, encoding: &'static Encoding) -> Option<String> {
+  let file_bytes = read(path)
     .with_context(|| format!("Cannot read file {}", path.to_string_lossy()))
     .map_err(|err| eprintln!("{err:#}"))
     .ok()?;
+  let (file_content, _encoding_used, had_errors) = encoding.decode(&file_bytes);
+  if had_errors {
+    // TODO add output
+    return None;
+  }
+  let file_content: String = file_content.into();
   // skip large files or empty file
   if file_too_large(&file_content) || file_content.is_empty() {
     // TODO add output
@@ -126,9 +133,10 @@ pub fn filter_file_interactive(
   path: &Path,
   configs: &RuleCollection<SgLang>,
   trace: &ScanTrace,
+  encoding: &'static Encoding,
 ) -> Option<Vec<(PathBuf, AstGrep, PreScan)>> {
   let lang = SgLang::from_path(path)?;
-  let file_content = read_file(path)?;
+  let file_content = read_file(path, encoding)?;
   let grep = lang.ast_grep(file_content);
   let mut ret = vec![];
   let root = filter(&grep, path, lang, configs, trace)
@@ -152,8 +160,9 @@ pub fn filter_file_pattern(
   lang: SgLang,
   root_matcher: Option<Pattern<SgLang>>,
   matchers: impl Iterator<Item = (SgLang, Pattern<SgLang>)>,
+  encoding: &'static Encoding,
 ) -> Option<Vec<(MatchUnit<Pattern<SgLang>>, SgLang)>> {
-  let file_content = read_file(path)?;
+  let file_content = read_file(path, encoding)?;
   let grep = lang.ast_grep(&file_content);
   let do_match = |ast_grep: AstGrep, matcher: Pattern<SgLang>, lang: SgLang| {
     let fixed = matcher.fixed_string();
