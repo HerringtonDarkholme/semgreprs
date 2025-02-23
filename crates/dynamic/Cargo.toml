@@ -17,7 +17,7 @@ ignore.workspace = true
 libloading = "0.8.3"
 serde.workspace = true
 thiserror.workspace = true
-tree-sitter-native = { version = "0.24.4", package = "tree-sitter" }
+tree-sitter-native = { version = "0.25.1", package = "tree-sitter" }
 
 [dev-dependencies]
 serde_yaml.workspace = true

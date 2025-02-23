@@ -30,10 +30,14 @@ pub struct KindMatcher<L: Language> {
 
 impl<L: Language> KindMatcher<L> {
   pub fn new(node_kind: &str, lang: L) -> Self {
+    let mut kind = lang
+      .get_ts_language()
+      .id_for_node_kind(node_kind, /*named*/ true);
+    if lang.get_ts_language().node_kind_is_supertype(kind) {
+      kind = 0;
+    }
     Self {
-      kind: lang
-        .get_ts_language()
-        .id_for_node_kind(node_kind, /*named*/ true),
+      kind,
       lang: PhantomData,
     }
   }

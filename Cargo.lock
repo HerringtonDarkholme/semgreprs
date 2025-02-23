@@ -139,7 +139,7 @@ dependencies = [
  "similar",
  "tempfile",
  "tokio",
- "tree-sitter-facade-sg",
+ "tree-sitter-facade-sg-codemod",
 ]
 
 [[package]]
@@ -155,7 +155,7 @@ dependencies = [
  "serde",
  "serde_yaml",
  "thiserror",
- "tree-sitter-typescript 0.21.2",
+ "tree-sitter-typescript-codemod",
 ]
 
 [[package]]
@@ -165,8 +165,8 @@ dependencies = [
  "bit-set",
  "regex",
  "thiserror",
- "tree-sitter-facade-sg",
- "tree-sitter-typescript 0.21.2",
+ "tree-sitter-facade-sg-codemod",
+ "tree-sitter-typescript-codemod",
 ]
 
 [[package]]
@@ -209,7 +209,7 @@ dependencies = [
  "tree-sitter-rust",
  "tree-sitter-scala",
  "tree-sitter-swift",
- "tree-sitter-typescript 0.23.2",
+ "tree-sitter-typescript",
  "tree-sitter-yaml",
 ]
 
@@ -240,7 +240,7 @@ dependencies = [
  "napi-build",
  "napi-derive",
  "serde_json",
- "tree-sitter-facade-sg",
+ "tree-sitter-facade-sg-codemod",
 ]
 
 [[package]]
@@ -385,9 +385,9 @@ checksum = "37b2a672a2cb129a2e41c10b1224bb368f9f37a2b16b612598138befd7b37eb5"
 
 [[package]]
 name = "cc"
-version = "1.2.3"
+version = "1.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "27f657647bcff5394bf56c7317665bbf790a137a50eaaa5c6bfbb9e27a518f2d"
+checksum = "e4730490333d58093109dc02c23174c3f4d490998c3fed3cc8e82d57afedb9cf"
 dependencies = [
  "shlex",
 ]
@@ -990,7 +990,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc2f4eb4bc735547cfed7c0a4922cbd04a4655978c09b54f1f7b228750664c34"
 dependencies = [
  "cfg-if",
- "windows-targets 0.48.5",
+ "windows-targets 0.52.6",
 ]
 
 [[package]]
@@ -1900,13 +1900,14 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter"
-version = "0.24.4"
+version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b67baf55e7e1b6806063b1e51041069c90afff16afcbbccd278d899f9d84bca4"
+checksum = "1a802c93485fb6781d27e27cb5927f6b00ff8d26b56c70af87267be7e99def97"
 dependencies = [
  "cc",
  "regex",
  "regex-syntax",
+ "serde_json",
  "streaming-iterator",
  "tree-sitter-language",
 ]
@@ -1972,17 +1973,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "tree-sitter-facade-sg"
-version = "0.24.5"
+name = "tree-sitter-facade-sg-codemod"
+version = "0.25.0-codemod.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9195ab85ddd7df7ddac5b2e397ec6264816ae640346013002ceccf0f9b3578f1"
+checksum = "005f585c281b7d653eb465df3fd011c8c6e880b6453480a3bb5b1b3893d2d515"
 dependencies = [
  "js-sys",
  "tree-sitter",
  "tree-sitter-language",
  "wasm-bindgen",
  "web-sys",
- "web-tree-sitter-sg",
+ "web-tree-sitter-sg-codemod",
 ]
 
 [[package]]
@@ -2133,19 +2134,19 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter-typescript"
-version = "0.21.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ecb35d98a688378e56c18c9c159824fd16f730ccbea19aacf4f206e5d5438ed9"
-dependencies = [
- "cc",
- "tree-sitter",
-]
-
-[[package]]
-name = "tree-sitter-typescript"
 version = "0.23.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c5f76ed8d947a75cc446d5fccd8b602ebf0cde64ccf2ffa434d873d7a575eff"
+dependencies = [
+ "cc",
+ "tree-sitter-language",
+]
+
+[[package]]
+name = "tree-sitter-typescript-codemod"
+version = "0.25.0-codemod.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e301b17f9159e7c3e0d0ab0ff5f290f21e0f6cc12916a2c132c194c6de42b0b1"
 dependencies = [
  "cc",
  "tree-sitter-language",
@@ -2335,10 +2336,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "web-tree-sitter-sg"
-version = "0.24.5"
+name = "web-tree-sitter-sg-codemod"
+version = "0.25.0-codemod.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69cf7d34b16550f076d75b4a5d4673f1a9692f79787d040e3ac7ddb04e5c48a0"
+checksum = "46ca5bd700962a2e1a631b0244068d1a33b74682c7a7307379d78ab7b4a4e8a7"
 dependencies = [
  "js-sys",
  "wasm-bindgen",

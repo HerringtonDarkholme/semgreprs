@@ -26,4 +26,4 @@ thiserror.workspace = true
 schemars.workspace = true
 
 [dev-dependencies]
-tree-sitter-typescript = "0.21.1"
+tree-sitter-typescript = { package = "tree-sitter-typescript-codemod", version = "0.25.0-codemod.1" }

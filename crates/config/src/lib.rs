@@ -55,7 +55,7 @@ mod test {
       Some(TypeScript::Tsx)
     }
     fn get_ts_language(&self) -> TSLanguage {
-      tree_sitter_typescript::language_tsx().into()
+      tree_sitter_typescript::LANGUAGE_TSX.into()
     }
   }
 

@@ -16,7 +16,9 @@ use referent_rule::{ReferentRule, ReferentRuleError};
 use relational_rule::{Follows, Has, Inside, Precedes};
 
 use ast_grep_core::language::Language;
-use ast_grep_core::matcher::{KindMatcher, KindMatcherError, RegexMatcher, RegexMatcherError};
+use ast_grep_core::matcher::{
+  KindMatcher, KindMatcherError, RegexMatcher, RegexMatcherError, SupertypeMatcher,
+};
 use ast_grep_core::meta_var::MetaVarEnv;
 use ast_grep_core::ops as o;
 use ast_grep_core::{Doc, MatchStrictness, Matcher, Node, Pattern, PatternError};
@@ -60,6 +62,9 @@ pub struct SerializableRule {
   /// the target node must exactly appear in the range.
   #[serde(default, skip_serializing_if = "Maybe::is_absent")]
   pub range: Maybe<SerializableRange>,
+  /// The supertype name of the node to match.
+  #[serde(default, skip_serializing_if = "Maybe::is_absent")]
+  pub supertype: Maybe<String>,
 
   // relational
   /// `inside` accepts a relational rule object.
@@ -110,6 +115,7 @@ impl SerializableRule {
         regex: self.regex.into(),
         nth_child: self.nth_child.into(),
         range: self.range.into(),
+        supertype: self.supertype.into(),
       },
       relational: RelationalRule {
         inside: self.inside.into(),
@@ -133,6 +139,7 @@ pub struct AtomicRule {
   pub regex: Option<String>,
   pub nth_child: Option<SerializableNthChild>,
   pub range: Option<SerializableRange>,
+  pub supertype: Option<String>,
 }
 #[derive(Serialize, Deserialize, Clone, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -211,6 +218,7 @@ pub enum Rule<L: Language> {
   // atomic
   Pattern(Pattern<L>),
   Kind(KindMatcher<L>),
+  Supertype(SupertypeMatcher<L>),
   Regex(RegexMatcher<L>),
   NthChild(NthChild<L>),
   Range(RangeMatcher<L>),
@@ -261,6 +269,7 @@ impl<L: Language> Rule<L> {
     match self {
       Rule::Pattern(p) => p.defined_vars(),
       Rule::Kind(_) => HashSet::new(),
+      Rule::Supertype(_) => HashSet::new(),
       Rule::Regex(_) => HashSet::new(),
       Rule::NthChild(n) => n.defined_vars(),
       Rule::Range(_) => HashSet::new(),
@@ -281,6 +290,7 @@ impl<L: Language> Rule<L> {
     match self {
       Rule::Pattern(_) => Ok(()),
       Rule::Kind(_) => Ok(()),
+      Rule::Supertype(_) => Ok(()),
       Rule::Regex(_) => Ok(()),
       Rule::NthChild(n) => n.verify_util(),
       Rule::Range(_) => Ok(()),
@@ -307,6 +317,7 @@ impl<L: Language> Matcher<L> for Rule<L> {
       // atomic
       Pattern(pattern) => pattern.match_node_with_env(node, env),
       Kind(kind) => kind.match_node_with_env(node, env),
+      Supertype(supertype) => supertype.match_node_with_env(node, env),
       Regex(regex) => regex.match_node_with_env(node, env),
       NthChild(nth_child) => nth_child.match_node_with_env(node, env),
       Range(range) => range.match_node_with_env(node, env),
@@ -329,6 +340,7 @@ impl<L: Language> Matcher<L> for Rule<L> {
       // atomic
       Pattern(pattern) => pattern.potential_kinds(),
       Kind(kind) => kind.potential_kinds(),
+      Supertype(supertype) => supertype.potential_kinds(),
       Regex(regex) => regex.potential_kinds(),
       NthChild(nth_child) => nth_child.potential_kinds(),
       Range(range) => range.potential_kinds(),
@@ -491,6 +503,12 @@ fn deserialze_atomic_rule<L: Language>(
   }
   if let Some(kind) = atomic.kind {
     rules.push(R::Kind(KindMatcher::try_new(&kind, env.lang.clone())?));
+  }
+  if let Some(supertype) = atomic.supertype {
+    rules.push(R::Supertype(SupertypeMatcher::new(
+      &supertype,
+      env.lang.clone(),
+    )));
   }
   if let Some(regex) = atomic.regex {
     rules.push(R::Regex(RegexMatcher::try_new(&regex)?));
