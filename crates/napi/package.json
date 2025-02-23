@@ -52,7 +52,7 @@
     "typegen": "ts-node scripts/generateTypes.ts"
   },
   "devDependencies": {
-    "@ast-grep/napi": "0.34.4",
+    "@ast-grep/napi": "0.35.0",
     "@biomejs/biome": "1.9.4",
     "@napi-rs/cli": "2.18.4",
     "@types/node": "^22.10.2",
